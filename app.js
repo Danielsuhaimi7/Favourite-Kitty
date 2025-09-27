@@ -17,20 +17,23 @@ function startSwiping() {
     catContainer.style.display = 'block';
     controls.style.display = 'flex';
     totalCats = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
-    fetchCats();
+    fetchCat();
 }
 
-function fetchCats() {
-    const fetchPromises = [];
-    
+function fetchCat() {
     fetch('https://cataas.com/cat')
         .then(response => response.blob())
         .then(imageBlob => {
             const imageElement = URL.createObjectURL(imageBlob);
             catImages.push(imageElement);
             showCat();
+            fetchRemainingCats();
         })
         .catch(error => console.error('Error fetching cat image:', error));
+}
+
+function fetchRemainingCats() {
+    const fetchPromises = [];
 
     for (let i = 1; i < totalCats; i++) {
         fetchPromises.push(
@@ -45,6 +48,7 @@ function fetchCats() {
                 })
         );
     }
+
     Promise.all(fetchPromises).then(() => {
         console.log('All cat images fetched');
     });
