@@ -7,7 +7,7 @@ const startButton = document.getElementById('start-button');
 const startContainer = document.getElementById('start-container');
 const controls = document.querySelector('.controls');
 let currentIndex = 0;
-let totalCats = 15;
+let totalCats = 15; 
 let startX = 0;
 let isSwiping = false;
 let catImageElement = null;
@@ -17,7 +17,12 @@ function startSwiping() {
     catContainer.style.display = 'block';
     controls.style.display = 'flex';
     totalCats = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+
+    // Fetch and display the first cat image immediately
     fetchCat();
+
+    // Fetch remaining cats in the background
+    fetchRemainingCats();
 }
 
 function fetchCat() {
@@ -27,14 +32,12 @@ function fetchCat() {
             const imageElement = URL.createObjectURL(imageBlob);
             catImages.push(imageElement);
             showCat();
-            fetchRemainingCats();
         })
         .catch(error => console.error('Error fetching cat image:', error));
 }
 
 function fetchRemainingCats() {
     const fetchPromises = [];
-
     for (let i = 1; i < totalCats; i++) {
         fetchPromises.push(
             fetch('https://cataas.com/cat')
@@ -48,7 +51,6 @@ function fetchRemainingCats() {
                 })
         );
     }
-
     Promise.all(fetchPromises).then(() => {
         console.log('All cat images fetched');
     });
@@ -62,13 +64,13 @@ function showCat() {
         img.classList.add('cat-image');
         catContainer.appendChild(img);
         catImageElement = img;
-    } else {
+    } else if (currentIndex >= 10) {
         showSummary();
     }
 }
 
 function swipeRight() {
-    if (currentIndex < catImages.length) {
+    if (catImageElement && currentIndex < catImages.length) {
         likedCats.push(catImages[currentIndex]);
         console.log("Liked Cat Index: ", currentIndex);
         currentIndex++;
@@ -77,7 +79,7 @@ function swipeRight() {
 }
 
 function swipeLeft() {
-    if (currentIndex < catImages.length) {
+    if (catImageElement && currentIndex < catImages.length) {
         dislikedCats.push(catImages[currentIndex]);
         console.log("Disliked Cat Index: ", currentIndex);
         currentIndex++;
