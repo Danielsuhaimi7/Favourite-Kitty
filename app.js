@@ -7,7 +7,7 @@ const startButton = document.getElementById('start-button');
 const startContainer = document.getElementById('start-container');
 const controls = document.querySelector('.controls');
 let currentIndex = 0;
-const totalCats = 15;
+let totalCats = 15;
 let startX = 0;
 let isSwiping = false;
 let catImageElement = null;
@@ -16,12 +16,23 @@ function startSwiping() {
     startContainer.style.display = 'none';
     catContainer.style.display = 'block';
     controls.style.display = 'flex';
+    totalCats = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
     fetchCats();
 }
 
 function fetchCats() {
     const fetchPromises = [];
-    for (let i = 0; i < totalCats; i++) {
+    
+    fetch('https://cataas.com/cat')
+        .then(response => response.blob())
+        .then(imageBlob => {
+            const imageElement = URL.createObjectURL(imageBlob);
+            catImages.push(imageElement);
+            showCat();
+        })
+        .catch(error => console.error('Error fetching cat image:', error));
+
+    for (let i = 1; i < totalCats; i++) {
         fetchPromises.push(
             fetch('https://cataas.com/cat')
                 .then((response) => response.blob())
@@ -34,9 +45,8 @@ function fetchCats() {
                 })
         );
     }
-
     Promise.all(fetchPromises).then(() => {
-        showCat();
+        console.log('All cat images fetched');
     });
 }
 
@@ -87,29 +97,26 @@ function startSwipe(e) {
     if (!catImageElement) return;
     isSwiping = true;
     startX = e.clientX || e.touches[0].clientX;
-    catImageElement.style.transition = 'none'; 
+    catImageElement.style.transition = 'none';
 }
 
 function moveSwipe(e) {
     if (!isSwiping || !catImageElement) return;
     const currentX = e.clientX || e.touches[0].clientX;
     const diff = currentX - startX;
-    catImageElement.style.transform = `translateX(${diff}px) rotate(${diff / 20}deg)`; 
+
+    catImageElement.style.transform = `translateX(${diff}px) rotate(${diff / 20}deg)`;
 }
 
 function endSwipe(e) {
     if (!isSwiping || !catImageElement) return;
-    const endX = e.clientX || e.changedTouches[0].clientX;
-    const diff = endX - startX;
 
-    console.log("Swipe diff:", diff); 
+    const finalPosition = parseFloat(catImageElement.style.transform.replace('translateX(', '').replace('px)', ''));
 
-    if (Math.abs(diff) > 0) {
-        if (diff > -1) {
-            swipeRight();
-        } else {
-            swipeLeft(); 
-        }
+    if (finalPosition > 100) {
+        swipeRight();
+    } else if (finalPosition < -100) {
+        swipeLeft();
     } else {
         catImageElement.style.transition = 'transform 0.3s ease';
         catImageElement.style.transform = 'translateX(0)';
@@ -117,7 +124,6 @@ function endSwipe(e) {
 
     isSwiping = false;
 }
-
 
 catContainer.addEventListener('mousedown', startSwipe);
 catContainer.addEventListener('mousemove', moveSwipe);
