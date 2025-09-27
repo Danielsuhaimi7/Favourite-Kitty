@@ -84,29 +84,27 @@ function showSummary() {
 }
 
 function startSwipe(e) {
+  if (!catImageElement) return;
   isSwiping = true;
   startX = e.clientX || e.touches[0].clientX;
   catImageElement.style.transition = 'none';
 }
 
 function moveSwipe(e) {
-  if (!isSwiping) return;
-
+  if (!isSwiping || !catImageElement) return;
   const currentX = e.clientX || e.touches[0].clientX;
   const diff = currentX - startX;
-
   catImageElement.style.transform = `translateX(${diff}px)`;
 }
 
 function endSwipe(e) {
-  if (!isSwiping) return;
-
+  if (!isSwiping || !catImageElement) return;
   const endX = e.clientX || e.changedTouches[0].clientX;
   const diff = endX - startX;
 
-  if (diff > 10) {
+  if (diff > 50) {
     swipeRight();
-  } else if (diff < -10) {
+  } else if (diff < -50) {
     swipeLeft();
   } else {
     catImageElement.style.transition = 'transform 0.3s ease';
@@ -114,6 +112,24 @@ function endSwipe(e) {
   }
 
   isSwiping = false;
+}
+
+function swipeRight() {
+  if (currentIndex < catImages.length) {
+    likedCats.push(catImages[currentIndex]);
+    console.log("Liked Cat Index: ", currentIndex); 
+    currentIndex++;
+    showCat();
+  }
+}
+
+function swipeLeft() {
+  if (currentIndex < catImages.length) {
+    dislikedCats.push(catImages[currentIndex]);
+    console.log("Disliked Cat Index: ", currentIndex);
+    currentIndex++;
+    showCat();
+  }
 }
 
 catContainer.addEventListener('mousedown', startSwipe);

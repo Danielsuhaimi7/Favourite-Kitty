@@ -17,10 +17,19 @@ header {
   padding: 20px;
   color: #fff;
   width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
 }
 
 #start-container {
   display: block;
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .cat-container {
@@ -32,7 +41,6 @@ header {
   width: 100%;
   max-width: 500px;
   overflow: hidden;
-  display: none;
 }
 
 .cat-image {
@@ -45,7 +53,9 @@ header {
 
 .controls {
   margin-top: 20px;
-  display: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button {
