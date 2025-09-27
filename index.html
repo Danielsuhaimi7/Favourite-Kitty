@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paws & Preferences - Find Your Favourite Kitty</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Find Your Favourite Kitty</h1>
+      <p>Swipe left to dislike, swipe right to like!</p>
+    </header>
+
+    <div id="start-container">
+      <button id="start-button" onclick="startSwiping()">Start</button>
+      <p id="start-note">Click "Start" to begin swiping through the cat images and select your favorites!</p>
+      <p id="start-note">The first cat might take a few seconds to load!</p>
+    </div>
+
+    <div class="cat-container">
+    </div>
+
+    <div class="controls">
+      <button class="dislike-button" onclick="swipeLeft()">Dislike</button>
+      <button class="like-button" onclick="swipeRight()">Like</button>
+    </div>
+
+    <div class="summary-container"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
