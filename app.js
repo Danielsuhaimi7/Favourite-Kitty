@@ -8,11 +8,14 @@ const startContainer = document.getElementById('start-container');
 const controls = document.querySelector('.controls');
 let currentIndex = 0;
 const totalCats = 15;
+let startX = 0;
+let isSwiping = false;
+let catImageElement = null;
 
 function startSwiping() {
-  startContainer.style.display = 'none';  // Hide the start button
-  catContainer.style.display = 'block';   // Show the cat container
-  controls.style.display = 'block';       // Show the swipe buttons
+  startContainer.style.display = 'none'; 
+  catContainer.style.display = 'block';
+  controls.style.display = 'block';
   fetchCats();
 }
 
@@ -39,11 +42,11 @@ function fetchCats() {
 
 function showCat() {
   if (currentIndex < catImages.length) {
-    const imageElement = document.createElement('img');
-    imageElement.src = catImages[currentIndex];
-    imageElement.classList.add('cat-image');
+    catImageElement = document.createElement('img');
+    catImageElement.src = catImages[currentIndex];
+    catImageElement.classList.add('cat-image');
     catContainer.innerHTML = '';
-    catContainer.appendChild(imageElement);
+    catContainer.appendChild(catImageElement);
   } else {
     showSummary();
   }
@@ -79,6 +82,47 @@ function showSummary() {
   summaryContainer.style.marginTop = '20px';
   summaryContainer.style.padding = '20px';
 }
+
+function startSwipe(e) {
+  isSwiping = true;
+  startX = e.clientX || e.touches[0].clientX;
+  catImageElement.style.transition = 'none';
+}
+
+function moveSwipe(e) {
+  if (!isSwiping) return;
+
+  const currentX = e.clientX || e.touches[0].clientX;
+  const diff = currentX - startX;
+
+  catImageElement.style.transform = `translateX(${diff}px)`;
+}
+
+function endSwipe(e) {
+  if (!isSwiping) return;
+
+  const endX = e.clientX || e.changedTouches[0].clientX;
+  const diff = endX - startX;
+
+  if (diff > 10) {
+    swipeRight();
+  } else if (diff < -10) {
+    swipeLeft();
+  } else {
+    catImageElement.style.transition = 'transform 0.3s ease';
+    catImageElement.style.transform = 'translateX(0)';
+  }
+
+  isSwiping = false;
+}
+
+catContainer.addEventListener('mousedown', startSwipe);
+catContainer.addEventListener('mousemove', moveSwipe);
+catContainer.addEventListener('mouseup', endSwipe);
+
+catContainer.addEventListener('touchstart', startSwipe);
+catContainer.addEventListener('touchmove', moveSwipe);
+catContainer.addEventListener('touchend', endSwipe);
 
 document.querySelector('.like-button').addEventListener('click', swipeRight);
 document.querySelector('.dislike-button').addEventListener('click', swipeLeft);
