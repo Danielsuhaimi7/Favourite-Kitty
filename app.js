@@ -89,8 +89,17 @@ function showSummary() {
         <div class="liked-cats">
           ${likedCats.map((catSrc) => `<img src="${catSrc}" alt="liked cat" />`).join('')}
         </div>
+        <button onclick="startOver()">Start Over</button>
       `;
     summaryContainer.style.display = 'block';
+}
+
+function startOver() {
+    likedCats = [];
+    dislikedCats = [];
+    currentIndex = 0;
+    summaryContainer.style.display = 'none';
+    showCat();
 }
 
 function startSwipe(e) {
