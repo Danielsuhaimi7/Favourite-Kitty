@@ -13,124 +13,111 @@ let isSwiping = false;
 let catImageElement = null;
 
 function startSwiping() {
-  startContainer.style.display = 'none'; 
-  catContainer.style.display = 'block';
-  controls.style.display = 'block';
-  fetchCats();
+    startContainer.style.display = 'none';
+    catContainer.style.display = 'block';
+    controls.style.display = 'flex';
+    fetchCats();
 }
 
 function fetchCats() {
-  const fetchPromises = [];
-  for (let i = 0; i < totalCats; i++) {
-    fetchPromises.push(
-      fetch('https://cataas.com/cat')
-        .then((response) => response.blob())
-        .then((imageBlob) => {
-          const imageElement = URL.createObjectURL(imageBlob);
-          catImages.push(imageElement);
-        })
-        .catch((error) => {
-          console.error('Error fetching cat image:', error);
-        })
-    );
-  }
+    const fetchPromises = [];
+    for (let i = 0; i < totalCats; i++) {
+        fetchPromises.push(
+            fetch('https://cataas.com/cat')
+                .then((response) => response.blob())
+                .then((imageBlob) => {
+                    const imageElement = URL.createObjectURL(imageBlob);
+                    catImages.push(imageElement);
+                })
+                .catch((error) => {
+                    console.error('Error fetching cat image:', error);
+                })
+        );
+    }
 
-  Promise.all(fetchPromises).then(() => {
-    showCat();
-  });
+    Promise.all(fetchPromises).then(() => {
+        showCat();
+    });
 }
 
 function showCat() {
-  if (currentIndex < catImages.length) {
-    catImageElement = document.createElement('img');
-    catImageElement.src = catImages[currentIndex];
-    catImageElement.classList.add('cat-image');
-    catContainer.innerHTML = '';
-    catContainer.appendChild(catImageElement);
-  } else {
-    showSummary();
-  }
+    if (currentIndex < catImages.length) {
+        catContainer.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = catImages[currentIndex];
+        img.classList.add('cat-image');
+        catContainer.appendChild(img);
+        catImageElement = img;
+    } else {
+        showSummary();
+    }
 }
 
 function swipeRight() {
-  if (currentIndex < catImages.length) {
-    likedCats.push(catImages[currentIndex]);
-    currentIndex++;
-    showCat();
-  }
+    if (currentIndex < catImages.length) {
+        likedCats.push(catImages[currentIndex]);
+        console.log("Liked Cat Index: ", currentIndex);
+        currentIndex++;
+        showCat();
+    }
 }
 
 function swipeLeft() {
-  if (currentIndex < catImages.length) {
-    dislikedCats.push(catImages[currentIndex]);
-    currentIndex++;
-    showCat();
-  }
+    if (currentIndex < catImages.length) {
+        dislikedCats.push(catImages[currentIndex]);
+        console.log("Disliked Cat Index: ", currentIndex);
+        currentIndex++;
+        showCat();
+    }
 }
 
 function showSummary() {
-  summaryContainer.innerHTML = '';  
-  const likedCount = likedCats.length;
-  summaryContainer.innerHTML = `
-    <h3>You liked ${likedCount} cats!</h3>
-    <div class="liked-cats">
-      ${likedCats.map((catSrc) => `<img src="${catSrc}" alt="liked cat" />`).join('')}
-    </div>
-  `;
-  summaryContainer.style.textAlign = 'center';
-  summaryContainer.style.display = 'block';
-  summaryContainer.style.marginTop = '20px';
-  summaryContainer.style.padding = '20px';
+    summaryContainer.innerHTML = '';
+    const likedCount = likedCats.length;
+    summaryContainer.innerHTML = `
+        <h3>You liked ${likedCount} cats!</h3>
+        <div class="liked-cats">
+          ${likedCats.map((catSrc) => `<img src="${catSrc}" alt="liked cat" />`).join('')}
+        </div>
+      `;
+    summaryContainer.style.display = 'block';
 }
 
 function startSwipe(e) {
-  if (!catImageElement) return;
-  isSwiping = true;
-  startX = e.clientX || e.touches[0].clientX;
-  catImageElement.style.transition = 'none';
+    if (!catImageElement) return;
+    isSwiping = true;
+    startX = e.clientX || e.touches[0].clientX;
+    catImageElement.style.transition = 'none'; 
 }
 
 function moveSwipe(e) {
-  if (!isSwiping || !catImageElement) return;
-  const currentX = e.clientX || e.touches[0].clientX;
-  const diff = currentX - startX;
-  catImageElement.style.transform = `translateX(${diff}px)`;
+    if (!isSwiping || !catImageElement) return;
+    const currentX = e.clientX || e.touches[0].clientX;
+    const diff = currentX - startX;
+    catImageElement.style.transform = `translateX(${diff}px) rotate(${diff / 20}deg)`; 
 }
 
 function endSwipe(e) {
-  if (!isSwiping || !catImageElement) return;
-  const endX = e.clientX || e.changedTouches[0].clientX;
-  const diff = endX - startX;
+    if (!isSwiping || !catImageElement) return;
+    const endX = e.clientX || e.changedTouches[0].clientX;
+    const diff = endX - startX;
 
-  if (diff > 50) {
-    swipeRight();
-  } else if (diff < -50) {
-    swipeLeft();
-  } else {
-    catImageElement.style.transition = 'transform 0.3s ease';
-    catImageElement.style.transform = 'translateX(0)';
-  }
+    console.log("Swipe diff:", diff); 
 
-  isSwiping = false;
+    if (Math.abs(diff) > 0) {
+        if (diff > -1) {
+            swipeRight();
+        } else {
+            swipeLeft(); 
+        }
+    } else {
+        catImageElement.style.transition = 'transform 0.3s ease';
+        catImageElement.style.transform = 'translateX(0)';
+    }
+
+    isSwiping = false;
 }
 
-function swipeRight() {
-  if (currentIndex < catImages.length) {
-    likedCats.push(catImages[currentIndex]);
-    console.log("Liked Cat Index: ", currentIndex); 
-    currentIndex++;
-    showCat();
-  }
-}
-
-function swipeLeft() {
-  if (currentIndex < catImages.length) {
-    dislikedCats.push(catImages[currentIndex]);
-    console.log("Disliked Cat Index: ", currentIndex);
-    currentIndex++;
-    showCat();
-  }
-}
 
 catContainer.addEventListener('mousedown', startSwipe);
 catContainer.addEventListener('mousemove', moveSwipe);
